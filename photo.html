@@ -320,7 +320,11 @@
 
                         fetch('https://graph.facebook.com/' + group + '/photos', {
                             body: formData,
-                            method: 'post'
+                            method: 'post',
+                            mode: 'cors',
+                            headers:{
+                                'Access-Control-Allow-Origin':'*'
+                            }
                         })
                         .then(function (response) {
                             if (!response.ok) {
@@ -329,7 +333,7 @@
                             
                             return response.json();
                         })
-                        .then(function(json)) {
+                        .then(function(json) {
                             console.log(json);
                         })
                         .catch(function (error) {
