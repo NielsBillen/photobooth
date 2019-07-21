@@ -320,10 +320,11 @@
 
                         fetch('https://graph.facebook.com/' + group + '/photos', {
                             body: formData,
-                            method: 'post',
+                            method: 'POST',
                             mode: 'cors',
                             headers:{
-                                'Access-Control-Allow-Origin':'*'
+                                'Access-Control-Allow-Origin':'*',
+                                'Content-Type': 'application/json'
                             }
                         })
                         .then(function (response) {
@@ -337,6 +338,7 @@
                             console.log(json);
                         })
                         .catch(function (error) {
+                            alert(error);
                             console.log(error);
                         });                     
                     }, 'image/jpg', 0.95);
