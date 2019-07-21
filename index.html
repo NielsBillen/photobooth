@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang = "nl">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <style>
+            @font-face {
+  				font-family: "curly";
+  				src: url("fonts/dancingscript/DancingScript-Bold.ttf");
+			}
+            
+            @font-face {
+  				font-family: "fira";
+  				src: url("fonts/firasans/FiraSans-Regular.ttf");
+			}
+			
+			html {
+				font-family: "fira";
+                color: darkslategrey;
+			}
+            
+            html, body {
+				margin:0;
+				width: 100vw;
+				height: 100vh;
+			}
+            
+            body {
+				background-image: url("img/background/rose.png");
+				background-repeat: repeat;
+                
+                display: flex;
+                align-items: center;
+                justify-content: center;
+			}
+            
+            #login-wrapper {
+                display: flex;
+                flex-direction: column;
+                
+                padding: 16px;
+                width: 320px;
+                height: 240px;
+                background: white;
+                box-shadow: 0px 0px 2px gray;
+                border-radius: 4px;
+            }
+            
+            .stretch {
+                flex: 1;
+            }
+            
+            #access-token, #group {
+                height: 24px;
+            }
+            
+            #continue {
+                align-self: flex-end;    
+            }
+            
+            input {
+                font-family: "fira";
+            }
+        </style>
+    </head>
+    <body>
+        <div id = login-wrapper>
+            <p><b>Login</b></p>
+            <p>Enter your Facebook access token:</p>
+            <input id = "access-token" type = "text" placeholder = "access token"/>
+            <p>Enter the Facebook group id:</p>
+            <input id = "group" type = "text" placeholder = "group id"/>
+            <div class = "stretch"></div>
+            <input id = "continue" type = "button" value = "Continue">
+        </div>
+        <script>
+            const continueButton = document.getElementById("continue");
+            const accessTokenInput = document.getElementById("access-token");
+            const groupInput = document.getElementById("group");
+            
+            continueButton.addEventListener("click", function () {
+                localStorage.setItem("access_token", accessTokenInput.value);
+                localStorage.setItem("group", groupInput.value);
+                window.location = "photo.html";
+            });
+        </script>
+    </body>
+</html>

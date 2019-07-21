@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang = "nl">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+		<style>
+			@font-face {
+  				font-family: "curly";
+  				src: url("fonts/dancingscript/DancingScript-Bold.ttf");
+			}
+			
+			html {
+				font-family: "curly";
+				text-align:center;
+				color: white;
+				text-shadow: 0px 0px 4px black;
+			}
+
+			html, body {
+				margin:0;
+				width: 100vw;
+				height: 100vh;
+			}
+	
+			body {
+				background-image: url("img/background/rose.png");
+				background-repeat: repeat;
+			}
+			
+			#header {
+				position: absolute;
+				width: 100%;
+				top: 16px;
+			}
+			
+			h1 {
+				margin: 0px;
+				font-size: 8vmin;
+				text-align:center;
+			}
+			
+			.center {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+			}
+			
+			#video {
+				position: absolute;
+				left:0;
+				right:0;
+				width: 100%;
+				height: 100%;
+				/*z-index: -1000;*/
+				object-fit: cover;
+			}
+
+			
+			.button-container {
+				display: flex;
+				flex-direction: row;
+				position: fixed;
+				bottom: 0;
+                left: 0;
+                right: 0;
+			}
+			
+			.button-wrapper {
+				/*background-color: black;*/
+				border-radius: 128px;
+				border: 4px solid white;
+                box-sizing: content-box;
+				box-shadow: 0px 0px 2px black, inset 0px 0px 2px black;
+								
+				width: 128px;
+				height: 128px;
+				margin: 16px;
+			}
+			
+			.button {
+				width: 100px;
+				height: 100px;
+			}
+			
+			#counter {
+				display: none;
+				font-size: 20vmin;
+				z-index: 1;
+                
+                transition: transform 0.2s linear;
+			}
+			
+			#photo-preview-wrapper {
+				display: none;
+			}
+            
+            #flash {
+                position: fixed;
+                left: 0;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                background: white;
+                width: 100%;
+                height: 100%;
+                        
+                opacity: 0;
+                display: none;
+                transition: opacity 0.2s ease-out;
+            }
+            
+            #photo-button {
+                
+            }
+			
+			#photo-preview {
+				transform: rotate(5deg);
+				transform-origin: center center;
+				border: 1px solid black;
+				padding: 16px;
+				background-color: white;
+			}
+			
+			.page {
+				position: absolute;
+				left: 0;
+				right: 0;
+				top: 0;
+				bottom: 0;
+				
+				background-image: url("img/background/rose.jpg");
+				background-repeat: repeat;
+			}
+            
+            .stretch {
+                flex: 1;
+            }
+		</style>
+	</head>
+	<body>        
+		<div class = "page center">
+			<video id = "video"></video>	
+			<div class = "button-container center">
+				<div id = "photo-button" class = "button-wrapper center">
+					<input id = "button" class = "button" type = "image" src = "img/icons/camera-white.png"/>
+				</div>
+			</div>
+			<div id = "counter">
+				3
+			</div>
+		</div>
+		
+		<div id = "photo-preview-wrapper" class = "page center">
+			<canvas id = "photo-preview">
+			</canvas>
+			<div class = "button-container center">
+				<div id = "upload-button" class = "button-wrapper center">
+					<input class = "button" type = "image" src = "img/icons/upload.png"/>
+				</div>
+                <div class = "stretch"></div>
+				<div id = "cancel-button" class = "button-wrapper center">
+					<input class = "button" type = "image" src = "img/icons/cancel.png"/>
+				</div>
+			</div>
+		</div>
+		
+		<header id = "header">
+			<h1>Glenn &amp; Stefanie &mdash; Photobooth</h1>
+		</header>
+		
+        <div id = "flash">
+        </div>
+        
+		<script>
+			const wrapper = document.getElementById("wrapper");
+			const flash = document.getElementById("flash");
+			const video = document.getElementById("video");
+			const photoButton = document.getElementById("photo-button");
+			const cancelButton = document.getElementById("cancel-button");
+			const uploadButton = document.getElementById("upload-button");
+			const buffer = document.createElement("canvas");
+			const counter = document.getElementById("counter");
+			const preview = document.getElementById("photo-preview");
+			const previewWrapper = document.getElementById("photo-preview-wrapper");
+									
+			if (navigator.mediaDevices.getUserMedia) {
+				navigator.mediaDevices.getUserMedia({"video": true})
+					.then(function (stream) {
+						console.log(stream);
+						video.srcObject = stream;
+						video.style.display = "block";
+						video.play();
+						
+						window.addEventListener("resize", resize, true);
+                        resize();
+					}).catch(function (error) {                    
+                        window.addEventListener("resize", resize, true);
+                        resize();
+                    
+						alert(error);
+					});
+			}
+            
+       
+            const resize = function () {
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+                const windowRatio = windowWidth / windowHeight;
+
+                const videoWidth = video.videoWidth === 0 ? 640 : video.videoWidth;
+                const videoHeight = video.videoHeight === 0 ? 480 : video.videoHeight;
+                const videoRatio =  videoWidth / videoHeight;
+
+                if (videoRatio > windowRatio) {
+                    const w = 0.6 * windowWidth;
+                    const h = w / videoRatio;
+
+                    preview.style.width = w + "px";
+                    preview.style.height = h + "px";
+                } else {
+                    const h = 0.6 * windowHeight;
+                    const w = h * videoRatio;
+
+                    preview.style.width = w + "px";
+                    preview.style.height = h + "px";
+                }
+            }
+			
+			const capture = function () {
+				counter.style.display = "none";
+                counter.style.transform = "rotate(0deg)";
+				photoButton.style.display = "";
+				previewWrapper.style.display = "flex";
+				
+				const w = video.videoWidth;
+				const h = video.videoHeight;
+				
+				buffer.width = w;
+				buffer.height = h;
+				preview.width = w;
+				preview.height = h;
+				
+				const bufferContext = buffer.getContext("2d");
+				bufferContext.drawImage(video, 0, 0, w, h);
+				
+				const previewContext = preview.getContext("2d");
+				previewContext.drawImage(video, 0, 0, w, h);
+				
+				const data = buffer.toDataURL('image/png');
+				console.log(data);
+			};
+			
+			const countDown = function (start, timer) {				
+				if (timer <= 0) {
+					counter.innerHTML = "Smile!";
+					counter.style.display = "block";
+                    counter.style.transform = "rotate(" + ((start + 1) * 360) + "deg)";
+
+					
+                    setTimeout(function() {
+                        // flash the screen for 400ms
+                        flash.style.display = "block";
+                        flash.style.opacity = 0;
+                        setTimeout(function() {
+                            flash.style.opacity = 1;
+                        }, 10);
+                        
+                        setTimeout(function() {
+                            // perform the capture
+                            capture();
+                            
+                            // unfade the flash
+                            setTimeout(function() {
+                                flash.style.opacity = 0;
+                                setTimeout(function() {
+                                    flash.style.display = "none";
+                                }, 300);
+                            }, 400);
+                        }, 400);
+                    }, 1000);
+				} else {
+					counter.innerHTML = "" + timer;
+					counter.style.display = "block";
+                    setTimeout(function() {
+                        counter.style.transform = "rotate(" + ((start + 1 - timer) * 360) + "deg)";
+                    }, 10);
+					
+					setTimeout(function() {
+						countDown(start, timer - 1);	
+					}, 1000);
+				}
+			};
+            
+            uploadButton.addEventListener("click", function () {
+                uploadPhoto();
+                previewWrapper.style.display = "none";
+            });
+			
+			photoButton.addEventListener("click", function () {
+				photoButton.style.display = "none";
+				countDown(3, 3);				
+			});	
+			
+			cancelButton.addEventListener("click", function () {
+				previewWrapper.style.display = "none";
+			});
+            
+            const uploadPhoto = function() {
+                const access_token = localStorage.getItem("access_token");
+                const group = localStorage.getItem("group");
+                
+                if (access_token && group) {
+                    buffer.toBlob(function(photoData) {
+                        const formData = new FormData();
+
+                        formData.append('access_token', localStorage.getItem("access_token"));
+                        formData.append('source', photoData);
+                        formData.append('message', 'Awesome wedding photo');
+
+                        fetch('https://graph.facebook.com/' + group + '/photos', {
+                            body: formData,
+                            method: 'post'
+                        })
+                        .then(function (data) {
+                            console.log(data); 
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });                     
+                    }, 'image/jpg', 0.95);
+                }
+            }
+        </script>
+	</body>
+</html>
