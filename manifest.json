@@ -1,0 +1,44 @@
+{
+    "lang": "en",
+    "name": "Photo Booth",
+    "short_name": "Photo Booth",
+    "developer": "Niels Billen",
+    "start_url": ".",
+    "display": "standalone",
+    "orientation": "landscape",
+    "theme_color": "#ededed",
+    "background_color":  "#ddf8ff",
+    "icons": [{
+            "src": "img/icons/icon512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }, {
+            "src": "img/icons/icon256.png",
+            "sizes": "256x256",
+            "type": "image/png"
+        }, {
+            "src": "img/icons/icon144.png",
+            "sizes": "144x144",
+            "type": "image/png"
+        }, {
+            "src": "img/icons/icon96.png",
+            "sizes": "96x96",
+            "type": "image/png"
+        }, {
+            "src": "img/icons/icon64.png",
+            "sizes": "64x64",
+            "type": "image/png"
+        }, {
+            "src": "img/icons/icon48.png",
+            "sizes": "48x48",
+            "type": "image/png"
+        }, {
+            "src": "img/icons/icon32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        }, {
+            "src": "img/icons/icon16.png",
+            "sizes": "16x16",
+            "type": "image/png"
+        }]
+}
