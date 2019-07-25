@@ -4,6 +4,8 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
+		<title>Photo Booth</title>
+
 		<link rel = "manifest" href = "manifest.json">
 		<link rel = "shortcut icon" type = "image/png" sizes="512x512" href = "img/icons/icon512.png">
 		<link rel = "apple-touch-icon" type = "image/png" sizes="512x512" href = "img/icons/icon512.png">
@@ -78,14 +80,14 @@
                 box-sizing: content-box;
 				box-shadow: 0px 0px 2px black, inset 0px 0px 2px black;
 								
-				width: 128px;
-				height: 128px;
+				width: 96px;
+				height: 96px;
 				margin: 16px;
 			}
 			
 			.button {
-				width: 100px;
-				height: 100px;
+				width: 64px;
+				height: 64px;
 			}
 			
 			#counter {
@@ -118,13 +120,24 @@
             #photo-button {
                 
             }
-			
-			#photo-preview {
-				transform: rotate(5deg);
-				transform-origin: center center;
+
+			#photo-wrapper {
 				border: 1px solid black;
 				padding: 16px;
+				padding-bottom: 96px;
 				background-color: white;
+				transform: rotate(5deg);
+				transform-origin: center center;
+			}
+			
+			#photo-background {
+				background-color: black;
+			}
+			
+			#photo-preview {
+				opacity: 0;
+				transition: opacity 1s linear;
+				/*transition-delay: 0.2s;*/
 			}
 			
 			.page {
@@ -157,8 +170,9 @@
 		</div>
 		
 		<div id = "photo-preview-wrapper" class = "page center">
-			<canvas id = "photo-preview">
-			</canvas>
+			<div id = "photo-wrapper">
+				<div id = "photo-background"><canvas id = "photo-preview"></canvas></div>
+			</div>
 			<div class = "button-container center">
 				<div id = "upload-button" class = "button-wrapper center">
 					<input class = "button" type = "image" src = "img/icons/upload.png"/>
@@ -184,9 +198,10 @@
 			const photoButton = document.getElementById("photo-button");
 			const cancelButton = document.getElementById("cancel-button");
 			const uploadButton = document.getElementById("upload-button");
-			const buffer = document.createElement("canvas");
+			//const buffer = document.createElement("canvas");
 			const counter = document.getElementById("counter");
 			const preview = document.getElementById("photo-preview");
+			const preview_background = document.getElementById("photo-background");
 			const previewWrapper = document.getElementById("photo-preview-wrapper");
 									
 			if (navigator.mediaDevices.getUserMedia) {
@@ -218,18 +233,21 @@
                 const videoRatio =  videoWidth / videoHeight;
 
                 if (videoRatio > windowRatio) {
-                    const w = 0.6 * windowWidth;
+                    const w = 0.5 * windowWidth;
                     const h = w / videoRatio;
 
-                    preview.style.width = w + "px";
-                    preview.style.height = h + "px";
+                    preview.style.width = Math.round(w) + "px";
+                    preview.style.height = Math.round(h) + "px";
                 } else {
-                    const h = 0.6 * windowHeight;
+                    const h = 0.5 * windowHeight;
                     const w = h * videoRatio;
 
-                    preview.style.width = w + "px";
-                    preview.style.height = h + "px";
+                    preview.style.width = Math.round(w) + "px";
+                    preview.style.height = Math.round(h) + "px";
                 }
+				
+				preview_background.style.width = preview.style.width;
+				preview_background.style.height = preview.style.height;
             }
 			
 			const capture = function () {
@@ -238,19 +256,19 @@
 				photoButton.style.display = "";
 				previewWrapper.style.display = "flex";
 				
-				const w = video.videoWidth;
-				const h = video.videoHeight;
+				const w = Math.floor(video.videoWidth);
+				const h = Math.floor(video.videoHeight);
 				
-				buffer.width = w;
-				buffer.height = h;
+				//buffer.width = w;
+				//buffer.height = h;
 				preview.width = w;
 				preview.height = h;
 				
-				const bufferContext = buffer.getContext("2d");
-				bufferContext.drawImage(video, 0, 0, w, h);
+				//const bufferContext = buffer.getContext("2d");
+				//bufferContext.drawImage(video, 0, 0, w, h);
 				
 				const previewContext = preview.getContext("2d");
-				previewContext.drawImage(video, 0, 0, w, h);
+				previewContext.drawImage(video, 0, 0, w, h, 0, 0, w, h);
 				
 				//const data = buffer.toDataURL('image/png');
 			};
@@ -279,6 +297,7 @@
                                 flash.style.opacity = 0;
                                 setTimeout(function() {
                                     flash.style.display = "none";
+									preview.style.opacity = 1;
                                 }, 300);
                             }, 400);
                         }, 400);
@@ -303,7 +322,8 @@
 			
 			photoButton.addEventListener("click", function () {
 				photoButton.style.display = "none";
-				countDown(3, 3);				
+				countDown(3, 3);	
+				preview.style.opacity = 0;			
 			});	
 			
 			cancelButton.addEventListener("click", function () {
